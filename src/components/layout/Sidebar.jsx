@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { CloudSun, LayoutGrid, Settings, Star } from "lucide-react";
+import { ArrowLeftRight, CloudSun, Heart, LayoutGrid, Settings, Star } from "lucide-react";
 
-const NAV = [
+export const PRIMARY_NAV = [
   { to: "/weather", label: "Dashboard", icon: LayoutGrid },
-  { to: "/favorites", label: "Favorites", icon: Star },
+  { to: "/compare", label: "Compare", icon: ArrowLeftRight },
+  { to: "/favorites", label: "Favorites", icon: Star, mobileIcon: Heart },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -16,13 +17,13 @@ export default function Sidebar({ onNavigate, className = "" }) {
           <CloudSun className="h-5 w-5 text-white" aria-hidden="true" />
         </span>
         <span>
-          <span className="font-display block text-sm font-bold leading-tight">Weather Intelligence</span>
+          <span className="font-display block text-sm font-bold leading-tight">SkyPulse</span>
           <span className="text-[10px] font-semibold tracking-wide text-blue-300">DASHBOARD</span>
         </span>
       </Link>
 
       <nav aria-label="Primary" className="flex flex-col gap-0.5">
-        {NAV.map((item) => {
+        {PRIMARY_NAV.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.to;
           return (

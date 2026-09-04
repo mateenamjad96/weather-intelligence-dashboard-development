@@ -6,6 +6,18 @@ const HISTORY_LIMIT = 5;
 
 const WeatherContext = createContext(null);
 
+function isValidLocation(location) {
+  return Boolean(
+    location &&
+    Number.isFinite(location.latitude) &&
+    Number.isFinite(location.longitude) &&
+    location.latitude >= -90 &&
+    location.latitude <= 90 &&
+    location.longitude >= -180 &&
+    location.longitude <= 180
+  );
+}
+
 export function WeatherProvider({ children }) {
   const [storedSettings, setStoredSettings] = useLocalStorage("wid.settings", DEFAULT_SETTINGS);
   const [theme, setTheme] = useLocalStorage("wid.theme", DEFAULT_SETTINGS.theme);
@@ -16,9 +28,10 @@ export function WeatherProvider({ children }) {
 
   const settings = useMemo(() => mergeWithDefaults(storedSettings), [storedSettings]);
 
-  const [selectedLocation, setSelectedLocation] = useState(() =>
-    mergeWithDefaults(storedSettings).rememberLastLocation ? lastLocation : null
-  );
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    const shouldRestore = mergeWithDefaults(storedSettings).rememberLastLocation;
+    return shouldRestore && isValidLocation(lastLocation) ? lastLocation : null;
+  });
 
   // Sync: the <html> class drives every dark-mode style in the app.
   useEffect(() => {
@@ -38,12 +51,20 @@ export function WeatherProvider({ children }) {
 
   const selectLocation = useCallback(
     (location, { addToHistory = true } = {}) => {
+      if (!isValidLocation(location)) return false;
       setSelectedLocation(location);
       setLastLocation(location);
       if (addToHistory) addSearchHistory(location);
+      return true;
     },
     [addSearchHistory, setLastLocation]
   );
+
+  useEffect(() => {
+    if (!selectedLocation || isValidLocation(selectedLocation)) return;
+    setSelectedLocation(null);
+    setLastLocation(null);
+  }, [selectedLocation, setLastLocation]);
 
   const addFavorite = useCallback(
     (location) => {

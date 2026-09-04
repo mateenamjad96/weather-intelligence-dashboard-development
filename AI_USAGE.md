@@ -1,4 +1,4 @@
-# AI Usage Disclosure — Weather Intelligence Dashboard
+# AI Usage Disclosure — SkyPulse
 
 > This document is a template for the developer to complete honestly.
 > Replace every placeholder in angle brackets with your real experience.

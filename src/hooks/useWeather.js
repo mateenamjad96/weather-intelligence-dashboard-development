@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchAirQuality, fetchWeather } from "../services/weatherService";
-import {
-  transformCurrentWeather,
-  transformDailyForecast,
-  transformHourlyForecast,
-} from "../utils/weatherTransformers";
+import { transformWeatherResponse } from "../utils/weatherTransformers";
 
 export function useWeather(location, { refreshMinutes = 0 } = {}) {
   const [weather, setWeather] = useState(null);
@@ -23,18 +19,7 @@ export function useWeather(location, { refreshMinutes = 0 } = {}) {
         fetchWeather(location.latitude, location.longitude),
         fetchAirQuality(location.latitude, location.longitude).catch(() => null),
       ]);
-      const transformedCurrent = transformCurrentWeather(data.current, data.daily, data.hourly);
-      setWeather({
-        timezone: data.timezone ?? location.timezone ?? null,
-        current: {
-          ...transformedCurrent,
-          airQuality: airQuality
-            ? { usAqi: airQuality.us_aqi ?? null, pm2_5: airQuality.pm2_5 ?? null }
-            : null,
-        },
-        hourly: transformHourlyForecast(data.hourly),
-        daily: transformDailyForecast(data.daily),
-      });
+      setWeather(transformWeatherResponse(data, { fallbackTimezone: location.timezone, airQuality }));
     } catch (requestError) {
       setError(requestError?.message ?? "Unable to load weather data.");
     } finally {

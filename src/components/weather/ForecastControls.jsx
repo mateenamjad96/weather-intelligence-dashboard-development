@@ -13,7 +13,7 @@ function ThresholdInput({ id, label, value, onValueChange }) {
         min="0"
         max="70"
         step="1"
-        className="input h-9 w-24 py-0 text-xs"
+        className="forecast-control-input input w-24 py-0"
         value={value}
         onChange={(event) => onValueChange(event.target.value)}
       />
@@ -46,9 +46,9 @@ export default function ForecastControls({
   };
 
   return (
-    <div className="flex flex-wrap items-end gap-x-5 gap-y-3 rounded-xl border border-[var(--card-border)] bg-[var(--chip-bg)] p-3">
+    <div className="flex flex-wrap items-end gap-x-4 gap-y-2 rounded-xl border border-[var(--card-border)] bg-[var(--chip-bg)] p-2.5">
       <fieldset>
-        <legend className="label-xs mb-2">Filter days</legend>
+        <legend className="label-xs mb-1.5">Filter days</legend>
         <div className="flex flex-wrap gap-1.5">
           {FILTER_OPTIONS.map((option) => {
             const active = activeFilter === option.id;
@@ -58,7 +58,7 @@ export default function ForecastControls({
                 type="button"
                 aria-pressed={active}
                 onClick={() => onFilterChange(option.id)}
-                className={`h-8 rounded-lg border px-3 text-xs font-semibold transition ${
+                className={`h-7 rounded-lg border px-2.5 text-[11px] font-semibold transition ${
                   active
                     ? "border-transparent bg-accent text-white shadow-md shadow-blue-500/30"
                     : "text-dim border-[var(--card-border)] hover:text-[var(--text-primary)]"
@@ -88,13 +88,13 @@ export default function ForecastControls({
         />
       )}
 
-      <div className="ml-auto flex items-end gap-2">
-        <label htmlFor="forecast-sort" className="label-xs pb-2">
+      <div className="ml-auto flex items-end gap-1.5">
+        <label htmlFor="forecast-sort" className="label-xs whitespace-nowrap pb-1.5">
           Sort by
         </label>
         <select
           id="forecast-sort"
-          className="input h-9 w-auto min-w-[170px] py-0 text-xs"
+          className="forecast-control-input input w-auto min-w-[170px] py-0"
           value={sortOption}
           onChange={(event) => onSortChange(event.target.value)}
         >

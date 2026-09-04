@@ -1,4 +1,4 @@
-# Weather Intelligence Dashboard
+# SkyPulse
 
 A frontend-only weather application built with **React (JavaScript) + Vite + React Router + Tailwind CSS**.
 It shows current conditions, hourly forecasts and a 7-day forecast for any city, with favorites,

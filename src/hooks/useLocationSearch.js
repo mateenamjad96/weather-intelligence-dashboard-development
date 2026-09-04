@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { searchLocations } from "../services/weatherService";
 
-const MIN_QUERY_LENGTH = 2;
-const DEBOUNCE_MS = 450;
+const DEFAULT_MIN_QUERY_LENGTH = 2;
+const DEFAULT_DEBOUNCE_MS = 450;
 
 // Owns everything related to the geocoding search box: controlled query,
 // results, loading/error state, debounced "as you type" requests and
 // AbortController cancellation of stale requests.
-export function useLocationSearch(onSelectLocation) {
+export function useLocationSearch(
+  onSelectLocation,
+  { minQueryLength = DEFAULT_MIN_QUERY_LENGTH, debounceMs = DEFAULT_DEBOUNCE_MS } = {}
+) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,9 +22,9 @@ export function useLocationSearch(onSelectLocation) {
     const trimmed = rawQuery.trim();
     abortControllerRef.current?.abort();
 
-    if (trimmed.length < MIN_QUERY_LENGTH) {
+    if (trimmed.length < minQueryLength) {
       setResults([]);
-      setError(trimmed.length ? `Enter at least ${MIN_QUERY_LENGTH} characters to search.` : null);
+      setError(trimmed.length ? `Enter at least ${minQueryLength} characters to search.` : null);
       setLoading(false);
       setHasSearched(false);
       return;
@@ -43,15 +46,15 @@ export function useLocationSearch(onSelectLocation) {
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
-  }, []);
+  }, [minQueryLength]);
 
   // Debounced suggestions while typing; form submit still searches immediately.
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 3) return undefined;
-    const timer = setTimeout(() => search(query), DEBOUNCE_MS);
+    if (trimmed.length < minQueryLength) return undefined;
+    const timer = setTimeout(() => search(query), debounceMs);
     return () => clearTimeout(timer);
-  }, [query, search]);
+  }, [debounceMs, minQueryLength, query, search]);
 
   useEffect(() => () => abortControllerRef.current?.abort(), []);
 
@@ -65,7 +68,8 @@ export function useLocationSearch(onSelectLocation) {
 
   const handleSelect = useCallback(
     (location) => {
-      onSelectLocation(location);
+      const accepted = onSelectLocation(location);
+      if (accepted === false) return;
       setQuery("");
       setResults([]);
       setError(null);

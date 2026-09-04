@@ -237,61 +237,6 @@ export default function SettingsForm() {
           </div>
         </Section>
 
-        <Section icon={RefreshCw} title="Data & Updates" subtitle="Data usage and update preferences">
-          <div className="flex flex-col gap-4">
-            <SelectField
-              id="auto-refresh"
-              label="Auto refresh weather"
-              value={draft.autoRefreshMinutes}
-              onChange={(event) => setField("autoRefreshMinutes", Number(event.target.value))}
-              error={errors.autoRefreshMinutes}
-              options={[
-                { value: 0, label: "Off" },
-                { value: 15, label: "Every 15 minutes" },
-                { value: 30, label: "Every 30 minutes" },
-                { value: 60, label: "Every hour" },
-              ]}
-            />
-            <p className="text-dim -mt-1 text-xs">
-              Auto refresh refetches the current location in the background while the dashboard is open.
-            </p>
-          </div>
-        </Section>
-
-        {errorList.length > 0 && (
-          <ErrorMessage
-            compact
-            title="Please fix the highlighted fields"
-            message={`Invalid values: ${errorList.map((key) => FIELD_LABELS[key] ?? key).join(", ")}.`}
-          />
-        )}
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-xs">
-            {dirty && (
-              <span className="text-warn flex items-center gap-1.5 font-semibold">
-                <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" />
-                Unsaved changes
-              </span>
-            )}
-            {savedFlash && (
-              <span className="fade-in flex items-center gap-1.5 font-semibold text-emerald-400">
-                <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                Settings saved
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <button type="button" className="btn btn-ghost" onClick={handleReset}>
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              Reset to Defaults
-            </button>
-            <button type="submit" className="btn btn-primary">
-              <Save className="h-4 w-4" aria-hidden="true" />
-              Save Settings
-            </button>
-          </div>
-        </div>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -350,6 +295,64 @@ export default function SettingsForm() {
             </div>
           </dl>
         </section>
+
+        <Section icon={RefreshCw} title="Data & Updates" subtitle="Data usage and update preferences">
+          <div className="flex flex-col gap-4">
+            <SelectField
+              id="auto-refresh"
+              label="Auto refresh weather"
+              value={draft.autoRefreshMinutes}
+              onChange={(event) => setField("autoRefreshMinutes", Number(event.target.value))}
+              error={errors.autoRefreshMinutes}
+              options={[
+                { value: 0, label: "Off" },
+                { value: 15, label: "Every 15 minutes" },
+                { value: 30, label: "Every 30 minutes" },
+                { value: 60, label: "Every hour" },
+              ]}
+            />
+            <p className="text-dim -mt-1 text-xs">
+              Auto refresh refetches the current location in the background while the dashboard is open.
+            </p>
+          </div>
+        </Section>
+      </div>
+
+      {errorList.length > 0 && (
+        <div className="xl:col-span-2">
+          <ErrorMessage
+            compact
+            title="Please fix the highlighted fields"
+            message={`Invalid values: ${errorList.map((key) => FIELD_LABELS[key] ?? key).join(", ")}.`}
+          />
+        </div>
+      )}
+
+      <div className="flex flex-col items-center justify-center gap-3 xl:col-span-2">
+        <div className="flex items-center gap-3 text-xs">
+          {dirty && (
+            <span className="text-warn flex items-center gap-1.5 font-semibold">
+              <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" />
+              Unsaved changes
+            </span>
+          )}
+          {savedFlash && (
+            <span className="fade-in flex items-center gap-1.5 font-semibold text-emerald-400">
+              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+              Settings saved
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button type="button" className="btn btn-ghost" onClick={handleReset}>
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+            Reset to Defaults
+          </button>
+          <button type="submit" className="btn btn-primary">
+            <Save className="h-4 w-4" aria-hidden="true" />
+            Save Settings
+          </button>
+        </div>
       </div>
     </form>
   );

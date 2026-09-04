@@ -1,20 +1,107 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, Star } from "lucide-react";
+import { ChevronDown, Heart, Plus, Star } from "lucide-react";
 import { formatRelativeMinutes } from "../utils/dateUtils";
 import { useAppContext } from "../context/WeatherContext";
 import { fetchCurrentWeather } from "../services/weatherService";
 import FavoritesList from "../components/favorites/FavoritesList";
-import SearchField from "../components/search/SearchField";
 import EmptyState from "../components/common/EmptyState";
+import SearchField from "../components/search/SearchField";
+
+const FAVORITES_SORT_OPTIONS = [
+  { value: "recent", label: "Recently added" },
+  { value: "name", label: "Name (A–Z)" },
+];
+
+function FavoritesSort({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+  const triggerRef = useRef(null);
+  const selectedLabel = FAVORITES_SORT_OPTIONS.find((option) => option.value === value)?.label;
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const handlePointerDown = (event) => {
+      if (!containerRef.current?.contains(event.target)) setOpen(false);
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const selectOption = (nextValue) => {
+    onChange(nextValue);
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  return (
+    <div ref={containerRef} className="relative z-20 w-full sm:w-48">
+      <button
+        ref={triggerRef}
+        id="favorites-sort"
+        type="button"
+        className="input !flex !h-10 items-center justify-between gap-2 py-0 !text-[13px]"
+        aria-label="Sort favorites"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls="favorites-sort-options"
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span>{selectedLabel}</span>
+        <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+      </button>
+      {open && (
+        <div
+          id="favorites-sort-options"
+          role="listbox"
+          aria-label="Sort favorites"
+          className="card fade-in absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden p-1"
+        >
+          {FAVORITES_SORT_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="option"
+              aria-selected={option.value === value}
+              className={`flex w-full items-center rounded-lg px-3 py-2 text-left text-xs transition-colors hover:bg-[var(--chip-bg)] ${
+                option.value === value ? "bg-blue-500 text-white" : "text-[var(--text-primary)]"
+              }`}
+              onClick={() => selectOption(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function FavoritesPage() {
-  const { favorites, removeFavorite, selectLocation, temperatureUnit, settings } = useAppContext();
+  const { favorites, addFavorite, removeFavorite, selectLocation, temperatureUnit, settings } = useAppContext();
   const navigate = useNavigate();
   const [sortOption, setSortOption] = useState("recent");
   const [weatherById, setWeatherById] = useState({});
   const [loadingWeather, setLoadingWeather] = useState(false);
   const [fetchedAt, setFetchedAt] = useState(null);
+  const [favoriteFeedback, setFavoriteFeedback] = useState(null);
+  const [isAddSearchOpen, setIsAddSearchOpen] = useState(false);
+
+  useEffect(() => {
+    if (!favoriteFeedback) return undefined;
+    const timeoutId = window.setTimeout(() => setFavoriteFeedback(null), 3500);
+    return () => window.clearTimeout(timeoutId);
+  }, [favoriteFeedback]);
 
   // One lightweight "current conditions" request per favorite, in parallel.
   useEffect(() => {
@@ -50,12 +137,17 @@ export default function FavoritesPage() {
     [navigate, selectLocation]
   );
 
-  const handleSearchSelect = useCallback(
+  const handleAddFavorite = useCallback(
     (location) => {
-      selectLocation(location);
-      navigate("/weather");
+      const added = addFavorite(location);
+      if (added) setIsAddSearchOpen(false);
+      setFavoriteFeedback({
+        type: added ? "success" : "duplicate",
+        message: added ? `${location.name} added to favorites` : `${location.name} is already in favorites`,
+      });
+      return true;
     },
-    [navigate, selectLocation]
+    [addFavorite]
   );
 
   const sortedFavorites =
@@ -73,24 +165,39 @@ export default function FavoritesPage() {
           </h1>
           <p className="text-dim text-sm">Your saved locations and quick weather overview</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="w-full min-w-[220px] sm:w-72">
-            <SearchField onSelectLocation={handleSearchSelect} id="favorites-search" placeholder="Search city to add…" />
+        <div className="flex w-full flex-wrap items-center justify-end gap-3 sm:w-auto">
+          <div className={`relative z-20 ${isAddSearchOpen ? "w-full sm:w-64 lg:w-72" : "w-auto"}`}>
+            {isAddSearchOpen ? (
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <SearchField
+                    onSelectLocation={handleAddFavorite}
+                    placeholder="Add new city..."
+                    id="favorites-add-city"
+                    minQueryLength={3}
+                    debounceMs={400}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="h-10 shrink-0 rounded-lg px-1.5 text-xs font-semibold text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  onClick={() => setIsAddSearchOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="btn btn-primary h-10 px-3"
+                onClick={() => setIsAddSearchOpen(true)}
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Add new city
+              </button>
+            )}
           </div>
-          <div>
-            <label htmlFor="favorites-sort" className="label-xs mb-1.5 block">
-              Sort by
-            </label>
-            <select
-              id="favorites-sort"
-              className="input h-11 w-auto py-0 text-sm"
-              value={sortOption}
-              onChange={(event) => setSortOption(event.target.value)}
-            >
-              <option value="recent">Recently added</option>
-              <option value="name">Name (A–Z)</option>
-            </select>
-          </div>
+          <FavoritesSort value={sortOption} onChange={setSortOption} />
         </div>
       </div>
 
@@ -133,6 +240,18 @@ export default function FavoritesPage() {
           </a>
         </span>
       </div>
+
+      {favoriteFeedback && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`card fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-50 max-w-[calc(100vw-2rem)] px-4 py-3 text-sm font-semibold shadow-xl lg:bottom-5 ${
+            favoriteFeedback.type === "success" ? "text-emerald-500" : "text-amber-500"
+          }`}
+        >
+          {favoriteFeedback.message}
+        </div>
+      )}
     </div>
   );
 }

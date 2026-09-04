@@ -1,4 +1,4 @@
-# Architecture — Weather Intelligence Dashboard
+# Architecture — SkyPulse
 
 ## Flow diagram
 

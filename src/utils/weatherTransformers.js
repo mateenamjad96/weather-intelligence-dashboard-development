@@ -74,6 +74,23 @@ export function transformDailyForecast(daily) {
   }));
 }
 
+export function transformWeatherResponse(data, { fallbackTimezone = null, airQuality = null } = {}) {
+  const current = transformCurrentWeather(data?.current, data?.daily, data?.hourly);
+  return {
+    timezone: data?.timezone ?? fallbackTimezone,
+    current: current
+      ? {
+          ...current,
+          airQuality: airQuality
+            ? { usAqi: airQuality.us_aqi ?? null, pm2_5: airQuality.pm2_5 ?? null }
+            : null,
+        }
+      : null,
+    hourly: transformHourlyForecast(data?.hourly),
+    daily: transformDailyForecast(data?.daily),
+  };
+}
+
 export function isRainyDay(day) {
   return (day?.precipitation ?? 0) > 0 || RAINY_CODES.includes(day?.weatherCode);
 }

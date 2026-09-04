@@ -26,12 +26,9 @@ export default function SearchBar({
         autoComplete="off"
         onChange={(event) => onQueryChange(event.target.value)}
       />
-      <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-2">
-        {loading && <Spinner className="h-4 w-4" />}
-        <button type="submit" className="btn btn-primary h-6 rounded-md px-3 text-[11px]" disabled={loading}>
-          {loading ? "Searching…" : "Search"}
-        </button>
-      </div>
+      {loading && (
+        <Spinner className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2" />
+      )}
     </form>
   );
 }

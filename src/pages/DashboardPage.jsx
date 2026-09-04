@@ -83,7 +83,7 @@ export default function DashboardPage() {
       appliedUrlKeyRef.current = urlKey;
       const latitude = Number(lat), longitude = Number(lon);
       const valid = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
-      if (!valid) { setUrlError("The link location is invalid — using the existing selection."); return; }
+      if (!valid) { setUrlError("The link location is invalid — using the existing selection."); setSearchParams({}, { replace: true }); return; }
       setUrlError(null);
       selectLocation({ id: `${latitude},${longitude}`, name: searchParams.get("name") || "Pinned location", country: searchParams.get("country") ?? "", admin1: searchParams.get("admin1") ?? "", latitude, longitude, timezone: null }, { addToHistory: false });
       return;
@@ -99,7 +99,7 @@ export default function DashboardPage() {
     return () => { cancelled = true; };
   }, [searchParams, selectLocation]);
 
-  useEffect(() => { if (!selectedLocation) return; const key = `coords:${selectedLocation.latitude},${selectedLocation.longitude}`; if (appliedUrlKeyRef.current === key) return; appliedUrlKeyRef.current = key; setSearchParams({ lat: String(selectedLocation.latitude), lon: String(selectedLocation.longitude), name: selectedLocation.name }, { replace: true }); }, [selectedLocation, setSearchParams]);
+  useEffect(() => { if (!selectedLocation || !Number.isFinite(selectedLocation.latitude) || !Number.isFinite(selectedLocation.longitude)) return; const key = `coords:${selectedLocation.latitude},${selectedLocation.longitude}`; if (appliedUrlKeyRef.current === key) return; appliedUrlKeyRef.current = key; setSearchParams({ lat: String(selectedLocation.latitude), lon: String(selectedLocation.longitude), name: selectedLocation.name }, { replace: true }); }, [selectedLocation, setSearchParams]);
 
   const handleSelectLocation = useCallback((location) => selectLocation(location), [selectLocation]);
   const handleToggleFavorite = useCallback(() => { if (!selectedLocation) return; isFavorite(selectedLocation.id) ? removeFavorite(selectedLocation.id) : addFavorite(selectedLocation); }, [addFavorite, isFavorite, removeFavorite, selectedLocation]);
@@ -122,9 +122,9 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-5">
       {urlError && <ErrorMessage title="Link location problem" message={urlError} onDismiss={() => setUrlError(null)} />}
       <EmptyState icon={SearchX} title="No city selected" message="Search for a city above to see current conditions, hourly data and the forecast." />
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid items-start gap-5 lg:grid-cols-2">
         <RecentSearches history={searchHistory} onSelect={handleSelectLocation} onClear={clearSearchHistory} />
-        <section className="card p-5" aria-label="Favorites preview"><h3 className="font-display text-base font-semibold mb-3 flex items-center gap-2"><Star className="h-4 w-4 text-amber-300" fill="currentColor" aria-hidden="true" /> Favorites</h3><FavoritesPreview favorites={favorites.slice(0,3)} weatherById={weatherById} onOpen={handleSelectLocation} /><a href="#/favorites" className="text-xs font-bold text-blue-300 mt-3 inline-block">View all →</a></section>
+        <section className="card p-5" aria-label="Favorites preview"><h3 className="font-display text-base font-semibold mb-3 flex items-center gap-2"><Star className="h-4 w-4 text-amber-300" fill="currentColor" aria-hidden="true" /> Favorites</h3><FavoritesPreview favorites={favorites.slice(0,3)} weatherById={weatherById} onOpen={handleSelectLocation} /><a href="#/favorites" className="ml-auto mt-3 block w-fit text-xs font-bold text-blue-300">View all →</a></section>
       </div>
     </div>
   );
@@ -143,9 +143,9 @@ export default function DashboardPage() {
           <HourlyWeather days={forecastDays} selectedDate={activeDay} onDateChange={setSelectedForecastDay} hours={visibleHours} unit={temperatureUnit} timeFormat={settings.timeFormat} currentHourPrefix={currentHourPrefix} isToday={isToday} />
           <Forecast days={visibleForecast} totalCount={forecastDays.length} unit={temperatureUnit} windUnit={settings.windUnit} timeFormat={settings.timeFormat} onResetFilter={() => setActiveFilter("all")} controlProps={{ activeFilter, onFilterChange: setActiveFilter, sortOption, onSortChange: setSortOption, hotThresholdC, windThresholdKmh, onHotThresholdChange: setHotThresholdC, onWindThresholdChange: setWindThresholdKmh, unit: temperatureUnit, windUnit: settings.windUnit }} />
           <WeatherStatistics statistics={statistics} unit={temperatureUnit} windUnit={settings.windUnit} />
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid items-start gap-5 lg:grid-cols-2">
             <RecentSearches history={searchHistory} onSelect={handleSelectLocation} onClear={clearSearchHistory} />
-            <section className="card p-5" aria-labelledby="fav-preview-title"><h3 className="font-display text-base font-semibold mb-3 flex items-center gap-2"><Star className="h-4 w-4 text-amber-300" fill="currentColor" aria-hidden="true" /> Favorites</h3><FavoritesPreview favorites={favorites.slice(0,3)} weatherById={weatherById} onOpen={handleSelectLocation} /><a href="#/favorites" className="text-xs font-bold text-blue-300 mt-3 inline-block">View all →</a></section>
+            <section className="card p-5" aria-labelledby="fav-preview-title"><h3 id="fav-preview-title" className="font-display text-base font-semibold mb-3 flex items-center gap-2"><Star className="h-4 w-4 text-amber-300" fill="currentColor" aria-hidden="true" /> Favorites</h3><FavoritesPreview favorites={favorites.slice(0,3)} weatherById={weatherById} onOpen={handleSelectLocation} /><a href="#/favorites" className="ml-auto mt-3 block w-fit text-xs font-bold text-blue-300">View all →</a></section>
           </div>
         </>
       )}

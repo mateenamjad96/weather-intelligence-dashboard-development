@@ -1,10 +1,12 @@
-import { ArrowRight, CloudRain, Droplets, Star, Trash2, Wind } from "lucide-react";
+import { useState } from "react";
+import { CloudRain, Droplets, MapPin, Trash2, Wind } from "lucide-react";
 import { getWeatherDescription } from "../../utils/weatherCodes";
 import { formatPrecipitation, formatTemperature, formatWindSpeed } from "../../utils/temperature";
 import { Skeleton } from "../common/Loading";
 import WeatherIcon from "../weather/WeatherIcon";
 
 export default function FavoriteCard({ location, current, loading, unit, windUnit, updatedLabel, onOpen, onRemove }) {
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
   const unitSymbol = unit === "fahrenheit" ? "F" : "C";
   const region = [location.admin1, location.country].filter(Boolean).join(", ");
 
@@ -20,7 +22,7 @@ export default function FavoriteCard({ location, current, loading, unit, windUni
           <div className="min-w-0">
             <h3 className="font-display flex items-center gap-2 text-lg font-semibold">
               <span className="truncate">{location.name}</span>
-              <Star className="h-4 w-4 shrink-0 text-amber-400" fill="currentColor" aria-label="Saved location" />
+              <MapPin className="h-4 w-4 shrink-0 text-blue-400" aria-hidden="true" />
             </h3>
             <p className="text-dim truncate text-xs">{region || "—"}</p>
           </div>
@@ -87,21 +89,34 @@ export default function FavoriteCard({ location, current, loading, unit, windUni
           </p>
         )}
 
-        <div className="mt-4 flex gap-2">
-          <button type="button" className="btn btn-ghost h-9 flex-1" onClick={() => onOpen(location)}>
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            Open
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost h-9 px-3"
-            onClick={() => onRemove(location.id)}
-            aria-label={`Remove ${location.name} from favorites`}
-            title="Remove from favorites"
-          >
-            <Trash2 className="h-4 w-4 text-rose-400" aria-hidden="true" />
-          </button>
-        </div>
+        {confirmingRemove ? (
+          <div className="mt-4 rounded-xl border border-rose-400/25 bg-rose-400/10 p-2.5" role="group" aria-label={`Confirm removing ${location.name}`}>
+            <p className="text-xs font-semibold">Are you sure you want to remove {location.name}?</p>
+            <div className="mt-2 flex justify-end gap-2">
+              <button type="button" className="btn btn-ghost h-8 px-3 text-xs" onClick={() => setConfirmingRemove(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn h-8 border border-rose-400/35 bg-rose-500 px-3 text-xs text-white hover:bg-rose-600" onClick={() => onRemove(location.id)}>
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 flex gap-2">
+            <button type="button" className="btn btn-primary h-9 flex-1" onClick={() => onOpen(location)}>
+              View details
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost h-9 px-3"
+              onClick={() => setConfirmingRemove(true)}
+              aria-label={`Remove ${location.name} from favorites`}
+              title="Remove from favorites"
+            >
+              <Trash2 className="h-4 w-4 text-rose-400" aria-hidden="true" />
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );

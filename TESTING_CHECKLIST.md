@@ -1,4 +1,4 @@
-# Manual Testing Checklist — Weather Intelligence Dashboard
+# Manual Testing Checklist — SkyPulse
 
 Tick each item in the browser before submission. Test at 1920 / 1440 / 1024 / 768 / 390 px widths.
 

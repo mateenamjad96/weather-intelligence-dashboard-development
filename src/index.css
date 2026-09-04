@@ -32,13 +32,14 @@
   --scroll-thumb: rgba(71, 85, 105, 0.3);
   --surface-border: rgba(71, 85, 105, 0.14);
   --surface-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(30,64,175,0.22);
-  --header-bg: rgba(238, 244, 255, 0.82);
-  --header-scrolled-bg: rgba(255, 255, 255, 0.38);
+  --header-bg: rgb(238, 244, 255);
+  --header-scrolled-bg: rgb(238, 244, 255);
   --header-border: rgba(71, 85, 105, 0.12);
   --control-hover-bg: rgba(59, 130, 246, 0.09);
   --control-hover-border: rgba(59, 130, 246, 0.2);
   --subtle-bg: rgba(71, 85, 105, 0.055);
   --subtle-border: rgba(71, 85, 105, 0.14);
+  --settings-page-bg: rgba(248, 250, 252, 0.5);
 }
 
 /* ---------- deep dark premium theme ---------- */
@@ -62,13 +63,14 @@
   --scroll-thumb: rgba(148, 163, 184, 0.22);
   --surface-border: rgba(255,255,255,0.06);
   --surface-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 20px 50px -15px rgba(0,0,0,0.6);
-  --header-bg: rgba(11, 17, 29, 0.82);
-  --header-scrolled-bg: rgba(11, 17, 29, 0.36);
+  --header-bg: rgb(11, 17, 29);
+  --header-scrolled-bg: rgb(11, 17, 29);
   --header-border: rgba(255,255,255,0.05);
   --control-hover-bg: rgba(255,255,255,0.10);
   --control-hover-border: rgba(255,255,255,0.14);
   --subtle-bg: rgba(255,255,255,0.035);
   --subtle-border: rgba(255,255,255,0.08);
+  --settings-page-bg: rgba(2, 6, 23, 0.24);
 }
 
 html { background: var(--bg-base); }
@@ -124,6 +126,7 @@ body {
 }
 
 .text-dim { color: var(--text-secondary); }
+.settings-page { background: var(--settings-page-bg); }
 
 .header-bg {
   background: var(--header-bg);
@@ -158,7 +161,7 @@ body {
 }
 .input::placeholder { color: var(--text-secondary); }
 .input:focus { outline:none; border-color:#6ba3ff; box-shadow:0 0 0 3px rgba(79,142,255,0.22); }
-.search-input { height:2.5rem; border-radius:0.9rem; padding-left:2.75rem; padding-right:6.25rem; font-size:0.85rem; }
+.search-input { height:2.5rem; border-radius:0.9rem; padding-left:2.75rem; padding-right:2.75rem; font-size:0.85rem; }
 
 .seg { display:inline-flex; gap:0.2rem; padding:0.2rem; border-radius:0.75rem;
   border:1px solid var(--card-border); background:var(--chip-bg); }
@@ -169,6 +172,9 @@ body {
 .seg-btn[data-active="true"] { background:#4f8eff; color:#fff; border-color:#4f8eff; box-shadow:0 6px 18px -8px rgba(79,142,255,0.7); }
 .navbar-unit-control { border-radius:0.8rem; padding:0.2rem; }
 .navbar-unit-control .seg-btn { height:1.75rem; min-width:2rem; border-radius:0.55rem; padding-inline:0.35rem; font-size:0.7rem; }
+.hourly-day-selector { padding-block:0.125rem; }
+.hourly-day-selector .seg-btn { height:1.6rem; font-size:0.75rem; }
+.forecast-control-input { height:1.75rem; font-size:0.75rem; }
 
 .nav-link { display:flex; align-items:center; gap:0.7rem; height:2.6rem; padding:0 0.8rem;
   border-radius:0.7rem; border:1px solid transparent; font-size:0.82rem; font-weight:600; color:var(--text-secondary);

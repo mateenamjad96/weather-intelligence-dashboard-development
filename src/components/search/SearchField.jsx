@@ -5,10 +5,16 @@ import SearchResults from "./SearchResults";
 
 // Self-contained search box: input + dropdown results + outside-click close.
 // Reused by the header and the Favorites page.
-export default function SearchField({ onSelectLocation, placeholder, id = "city-search" }) {
+export default function SearchField({
+  onSelectLocation,
+  placeholder,
+  id = "city-search",
+  minQueryLength = 2,
+  debounceMs = 450,
+}) {
   const containerRef = useRef(null);
   const { query, setQuery, results, loading, error, hasSearched, handleSubmit, handleSelect, handleClose } =
-    useLocationSearch(onSelectLocation);
+    useLocationSearch(onSelectLocation, { minQueryLength, debounceMs });
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -37,6 +43,7 @@ export default function SearchField({ onSelectLocation, placeholder, id = "city-
         loading={loading}
         error={error}
         hasSearched={hasSearched}
+        minQueryLength={minQueryLength}
         onSelect={handleSelect}
       />
     </div>

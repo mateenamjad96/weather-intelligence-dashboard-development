@@ -1,7 +1,7 @@
 import { Spinner } from "../common/Loading";
 import LocationCard from "./LocationCard";
 
-export default function SearchResults({ open, query, results, loading, error, hasSearched, onSelect }) {
+export default function SearchResults({ open, query, results, loading, error, hasSearched, minQueryLength = 2, onSelect }) {
   if (!open) return null;
   return (
     <div className="card fade-in absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden p-2">
@@ -20,7 +20,7 @@ export default function SearchResults({ open, query, results, loading, error, ha
               try a nearby city.
             </>
           ) : (
-            "Type at least 2 characters to search."
+            `Type at least ${minQueryLength} characters to search.`
           )}
         </p>
       ) : (

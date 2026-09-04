@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
+import MobileBottomNav from "./MobileBottomNav";
 import Sidebar from "./Sidebar";
 
 export default function AppLayout() {
@@ -39,10 +40,12 @@ export default function AppLayout() {
 
       <div className="lg:pl-[216px]">
         <Header />
-        <main id="main-content" className="dashboard-main mx-auto w-full max-w-[1440px] px-4 pb-20 pt-6 sm:px-6 xl:px-4">
+        <main id="main-content" className="dashboard-main mx-auto w-full max-w-[1440px] px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-6 sm:px-6 lg:pb-20 xl:px-4">
           <Outlet />
         </main>
       </div>
+
+      <MobileBottomNav />
     </div>
   );
 }

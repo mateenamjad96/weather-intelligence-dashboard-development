@@ -2,6 +2,7 @@ import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { WeatherProvider } from "./context/WeatherContext";
 import AppLayout from "./components/layout/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
+import ComparePage from "./pages/ComparePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import SettingsPage from "./pages/SettingsPage";
 
@@ -12,6 +13,7 @@ export default function App() {
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/weather" element={<DashboardPage />} />
+            <Route path="/compare" element={<ComparePage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/weather" replace />} />

@@ -3,6 +3,7 @@
 const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
 const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 const AIR_QUALITY_URL = "https://air-quality-api.open-meteo.com/v1/air-quality";
+const REVERSE_GEOCODING_URL = "https://api.bigdatacloud.net/data/reverse-geocode-client";
 
 const CURRENT_FIELDS = [
   "temperature_2m",
@@ -75,6 +76,20 @@ export async function searchLocations(query, count = 5, signal) {
   return data.results
     .filter((result) => Number.isFinite(result?.latitude) && Number.isFinite(result?.longitude))
     .map(mapGeocodingResult);
+}
+
+export async function reverseGeocodeLocation(latitude, longitude, signal) {
+  const params = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+    localityLanguage: "en",
+  });
+  const data = await getJson(`${REVERSE_GEOCODING_URL}?${params.toString()}`, signal);
+  const candidates = [data?.city, data?.locality, data?.principalSubdivision]
+    .filter((value) => typeof value === "string" && value.trim())
+    .map((value) => value.trim());
+
+  return { name: candidates[0] ?? "My location" };
 }
 
 export async function fetchWeather(latitude, longitude, signal) {
